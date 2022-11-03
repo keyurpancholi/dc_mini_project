@@ -18,12 +18,6 @@ client_data = {}
 
 def startReceivingClockTime(connector, address, data):
 
-    # while True:
-    # receive clock time
-    # data = connector.recv(1024).decode()
-    # data = json.loads(data)
-    # print("type=", data)
-
     if data['type'] != 'time':
         print_messages(data)
         return
@@ -58,11 +52,6 @@ def startConnecting(master_server):
 
         print(slave_address + " got connected successfully")
 
-        # current_thread = threading.Thread(
-        #     target=startReceivingClockTime,
-        #     args=(master_slave_connector,
-        #           slave_address, ))
-
         receive_messages = threading.Thread(target=receiveData,
                                             args=(master_slave_connector,
                                                   slave_address, ))
@@ -73,10 +62,6 @@ def startConnecting(master_server):
                 datetime.datetime.now())
         }
         startReceivingClockTime(master_slave_connector, slave_address, data)
-
-        # current_thread.start()
-
-# subroutine function used to fetch average clock difference
 
 
 def getAverageClockDiff():
@@ -144,7 +129,6 @@ def synchronizeAllClocks():
 
 
 def print_messages(data):
-    print('data=', data)
     if data['type'] == 'connect':
         name = data['name']
         print(f"{name} connected")

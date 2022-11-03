@@ -59,7 +59,8 @@ def startReceivingTime(slave_client):
 
 
 def acquireToken(slave_client):
-    print('Sent token request')
+    print(Fore.RED + 'Sent token request')
+    print(Style.RESET_ALL)
     data = {
         'type': 'broadcast_request',
         'cid': cid
@@ -69,7 +70,8 @@ def acquireToken(slave_client):
 
 
 def waitUntilLock():
-    print('Waiting for lock')
+    print(Fore.RED + 'Waiting for lock')
+    print(Style.RESET_ALL)
     while True:
         if hasToken == True:
             break
@@ -93,20 +95,24 @@ def handleRequests(slave_client):
 def sendMessage(slave_client):
     global isCritical, hasToken, cid
     while True:
-        # print("Send Message", end='\n')
         message = input()
         data = {
             'type': 'message',
             'message': message,
             'name': cid
         }
-        if not hasToken:
+        if hasToken:
+            print(Fore.RED + 'Already has the token')
+            print(Style.RESET_ALL)
+        elif not hasToken:
             acquireToken(slave_client)
             waitUntilLock()
             hasToken = True
-            print('Lock acquired')
+            print(Fore.RED + 'Lock acquired')
+            print(Style.RESET_ALL)
             isCritical = True
-        print('now sending message')
+        print(Fore.RED + 'Sending message Now')
+        print(Style.RESET_ALL)
         payload = json.dumps(data)
         slave_client.send(payload.encode())
         chatFile = open("chat.txt", "a")
@@ -120,10 +126,10 @@ def print_messages(data, slave_client):
     global name, hasToken, isCritical, cid, reqQ
     if data['type'] == 'connect':
         name = data['name']
-        print(f"{name} connected")
+        print(Fore.BLUE + f"{name} connected")
+        print(Style.RESET_ALL)
         if data['clientCount'] == 1:
             hasToken = True
-            print(cid, 'has token')
     if data['type'] == 'message':
         _name = data['name']
         message = data['message']
