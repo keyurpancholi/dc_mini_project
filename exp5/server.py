@@ -7,7 +7,7 @@ import socket
 import json
 import time
 import random
-
+from colorama import Fore, Style
 
 client_data = {}
 
@@ -139,7 +139,7 @@ def loadBalancer(slave_address):
     REQ_ARR[nextServer] = slave_address
 
 
-def print_messages(data):
+def print_messages(data, slave_address):
     if data['type'] == 'connect':
         name = data['name']
         print(f"{name} connected")
@@ -152,6 +152,8 @@ def print_messages(data):
             data = json.dumps(payload)
             client['connector'].send(data.encode())
     elif data.get('type') == 'message':
+        loadBalancer(slave_address)
+
         _name = data['name']
         message = data['message']
 
@@ -174,7 +176,6 @@ def receiveData(connector, slave_address):
         payload = connector.recv(1024).decode()
         print(payload)
         data = json.loads(payload)
-        # loadBalancer(slave_address)
         if data['type'] == 'time':
             startReceivingClockTime(connector, slave_address, data)
         elif data['type'] == 'broadcast_request' or data['type'] == 'token_release':
@@ -184,7 +185,7 @@ def receiveData(connector, slave_address):
                 client['connector'].send(payload.encode())
 
         else:
-            print_messages(data)
+            print_messages(data, slave_address)
 
 
 def mainServerThread(id):
@@ -196,7 +197,8 @@ def mainServerThread(id):
         time.sleep(.5)
         if(REQ_ARR[id - 1] != 0):
             arr.append(REQ_ARR[id - 1])
-            print(f'Assigned {REQ_ARR[id - 1]} to server {id}')
+            print(Fore.RED + f'Assigned {REQ_ARR[id - 1]} to server {id}')
+            print(Style.RESET_ALL)
             REQ_ARR[id - 1] = 0
 
 
